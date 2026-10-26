@@ -290,7 +290,7 @@ final class H264Decoder: @unchecked Sendable {
 
     /// Static C callback for VideoToolbox. Casts the refcon back to
     /// H264Decoder and forwards the decoded frame.
-    private let h264DecodeCallback: VTDecompressionOutputCallback = { _, refcon, status, _, imageBuffer, _, _ in
+    private let h264DecodeCallback: VTDecompressionOutputCallback = { refcon, _, status, _, imageBuffer, _, _ in
         // TEMP DEBUG
         if status != noErr, ProcessInfo.processInfo.environment["PASTORAL_RTSP_DEBUG"] != nil {
             print("vtb: callback de erro status=\(status)")

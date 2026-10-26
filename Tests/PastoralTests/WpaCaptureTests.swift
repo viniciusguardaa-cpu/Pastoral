@@ -128,10 +128,13 @@ struct WpaCaptureTests {
         #expect(f?.nonce == Self.hex(Self.nonceAP))
     }
 
-    @Test("message 4 (Secure|Ack, no install) is recognised, not crashed on")
+    @Test("message 4 (Secure|MIC, no ACK) is recognised, not crashed on")
     func messageFour() {
-        #expect(WpaCaptureParser.messagePair(from: 0x028A) == 4)
-        let p = Self.eapolPayload(flags: 0x028A, nonce: Self.nonceSTA)
+        // Real M4 Key Info: SECURE (0x0200) + MIC (0x0100) + pairwise (0x0008)
+        // + version 2 (0x0002), with the ACK bit clear — hcxtools' getkeyinfo()
+        // only reads SECURE when ACK is clear.
+        #expect(WpaCaptureParser.messagePair(from: 0x030A) == 4)
+        let p = Self.eapolPayload(flags: 0x030A, nonce: Self.nonceSTA)
         let f = WpaCaptureParser.parseEAPOL(p)
         #expect(f?.message == 4)
     }
@@ -235,12 +238,13 @@ struct WpaCaptureTests {
                              bssid: "aa:bb:cc:dd:ee:ff",
                              station: "",
                              essid: "")
-        // WPA*01*pmkid32*macAP12*macSTA12*essidhex***
+        // WPA*01*pmkid32*macAP12*macSTA12*essidhex***  → with an empty ESSID the
+        // three trailing separators collapse into four asterisks total.
         #expect(cap.hashcatLine ==
             "WPA*01*" + String(repeating: "e", count: 32)
             + "*aabbccddeeff"
             + "*" + String(repeating: "0", count: 12)
-            + "*****")
+            + "****")
     }
 
     @Test("unknown station macs fall back to twelve zeros, never colons")
