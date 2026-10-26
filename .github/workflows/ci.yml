@@ -9,12 +9,12 @@ on:
 
 jobs:
   build-and-test:
-    runs-on: macos-14
+    runs-on: macos-15
     steps:
       - uses: actions/checkout@v4
 
-      - name: Select Swift 6 toolchain
-        run: bash Scripts/ci-swift-toolchain.sh
+      - name: Select Swift toolchain
+        run: bash Scripts/ci-swift-toolchain.sh 6.2
 
       - name: Build
         run: swift build
@@ -35,14 +35,14 @@ jobs:
   release:
     needs: build-and-test
     if: startsWith(github.ref, 'refs/tags/')
-    runs-on: macos-14
+    runs-on: macos-15
     permissions:
       contents: write
     steps:
       - uses: actions/checkout@v4
 
-      - name: Select Swift 6 toolchain
-        run: bash Scripts/ci-swift-toolchain.sh
+      - name: Select Swift toolchain
+        run: bash Scripts/ci-swift-toolchain.sh 6.2
 
       - name: Build universal release
         run: swift build -c release --arch arm64 --arch x86_64

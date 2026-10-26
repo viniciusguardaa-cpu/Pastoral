@@ -22,7 +22,7 @@ Abrir a tela de tráfego não inicia uma captura. A página inicial consulta o s
 
 ## Desenvolvimento
 
-Requer Swift 6 ou superior.
+Requer Swift 6.2 ou superior (Xcode 26).
 
 ```sh
 swift build
