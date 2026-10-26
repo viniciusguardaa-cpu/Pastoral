@@ -1,0 +1,25 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE plist PUBLIC "-//Apple//DTD PLIST 1.0//EN" "http://www.apple.com/DTDs/PropertyList-1.0.dtd">
+<plist version="1.0">
+<dict>
+    <key>Label</key>
+    <string>com.pastoral.reset</string>
+
+    <key>ProgramArguments</key>
+    <array>
+        <string>/usr/local/sbin/pastoral-reset.sh</string>
+    </array>
+
+    <!-- Runs at every boot to re-apply ChmodBPF, since /dev/bpf* perms do
+         not survive a reboot (devices are recreated root:wheel 0600). -->
+    <key>RunAtLoad</key>
+    <true/>
+    <key>KeepAlive</key>
+    <false/>
+
+    <key>UserName</key>
+    <string>root</string>
+    <key>GroupName</key>
+    <string>wheel</string>
+</dict>
+</plist>

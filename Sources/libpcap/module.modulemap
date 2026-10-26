@@ -1,0 +1,5 @@
+module libpcap {
+    header "pcap.h"
+    link "libpcap"
+    export *
+}

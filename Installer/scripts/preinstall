@@ -1,0 +1,31 @@
+#!/bin/bash
+#
+# preinstall — runs before the payload is laid down.
+#
+# Creates the access_bpf group if it doesn't exist (the same group used by
+# Wireshark/tcpdump for BPF access), then applies ChmodBPF so the
+# unprivileged app can open /dev/bpf* for pcap. ChmodBPF does not survive a
+# reboot; the com.pastoral.reset LaunchDaemon redoes it at every boot.
+#
+set -e
+
+# Create the access_bpf group if absent.
+if ! dscl . -read /Groups/access_bpf >/dev/null 2>&1; then
+    # Pick a free gid >= 500.
+    GID=500
+    while dscl . -read /Groups/gid | grep -qw "$GID" 2>/dev/null; do
+        GID=$((GID + 1))
+    done
+    dscl . -create /Groups/access_bpf
+    dscl . -create /Groups/access_bpf PrimaryGroupID "$GID"
+    dscl . -create /Groups/access_bpf RealName "BPF Access Group"
+fi
+
+# ChmodBPF equivalent.
+for f in /dev/bpf*; do
+    [ -e "$f" ] || continue
+    chgrp access_bpf "$f" 2>/dev/null || true
+    chmod g+rw "$f" 2>/dev/null || true
+done
+
+exit 0

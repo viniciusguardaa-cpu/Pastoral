@@ -1,0 +1,36 @@
+#!/bin/bash
+#
+# postinstall — runs after the payload is laid down.
+#
+# Fixes permissions on the installed files, then bootstraps the two
+# LaunchDaemons:
+#   - com.pastoral.reset  (RunAtLoad=true)  → re-applies ChmodBPF now + at boot
+#   - com.pastoral.helper (RunAtLoad=true) → socket-activated on connect
+#
+set -e
+
+chown root:wheel /usr/local/sbin/pastoral-helper
+chmod 0755 /usr/local/sbin/pastoral-helper
+
+chown root:wheel /usr/local/sbin/pastoral-reset.sh
+chmod 0755 /usr/local/sbin/pastoral-reset.sh
+
+chown root:wheel /Library/LaunchDaemons/com.pastoral.helper.plist
+chmod 0644 /Library/LaunchDaemons/com.pastoral.helper.plist
+
+chown root:wheel /Library/LaunchDaemons/com.pastoral.reset.plist
+chmod 0644 /Library/LaunchDaemons/com.pastoral.reset.plist
+
+# Re-apply ChmodBPF now (the reset daemon also does it).
+/usr/local/sbin/pastoral-reset.sh || true
+
+# Bootstrap the reset daemon (runs immediately due to RunAtLoad=true).
+launchctl bootstrap system /Library/LaunchDaemons/com.pastoral.reset.plist 2>/dev/null || true
+launchctl enable system/com.pastoral.reset 2>/dev/null || true
+
+# Register the helper daemon so launchd creates the listening socket. It
+# starts immediately to assign secure socket ownership.
+launchctl bootstrap system /Library/LaunchDaemons/com.pastoral.helper.plist 2>/dev/null || true
+launchctl enable system/com.pastoral.helper 2>/dev/null || true
+
+exit 0

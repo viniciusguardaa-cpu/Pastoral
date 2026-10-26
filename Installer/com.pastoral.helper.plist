@@ -1,0 +1,40 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE plist PUBLIC "-//Apple//DTD PLIST 1.0//EN" "http://www.apple.com/DTDs/PropertyList-1.0.dtd">
+<plist version="1.0">
+<dict>
+    <key>Label</key>
+    <string>com.pastoral.helper</string>
+
+    <key>ProgramArguments</key>
+    <array>
+        <string>/usr/local/sbin/pastoral-helper</string>
+    </array>
+
+    <!-- Socket activation: launchd creates and listens on the Unix socket.
+         The helper is started on demand when a client connects. -->
+    <key>RunAtLoad</key>
+    <true/>
+    <key>KeepAlive</key>
+    <false/>
+
+    <key>Sockets</key>
+    <dict>
+        <key>PastoralSocket</key>
+        <dict>
+            <key>SockPathName</key>
+            <string>/var/run/pastoral.sock</string>
+            <!-- Root-only until the helper assigns the active console user. -->
+            <key>SockPathMode</key>
+            <integer>384</integer>
+        </dict>
+    </dict>
+
+    <key>UserName</key>
+    <string>root</string>
+    <key>GroupName</key>
+    <string>wheel</string>
+
+    <key>StandardErrorPath</key>
+    <string>/var/log/pastoral-helper.log</string>
+</dict>
+</plist>
